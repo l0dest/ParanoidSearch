@@ -14,6 +14,7 @@
 #define LOOT_TO_STEAL 20
 #define MAX_BULLETS 2
 #define ROOMS_NUM 12
+#define COMMANDS 4
 
 // Define the Crew Stats
 typedef struct
@@ -34,9 +35,12 @@ typedef struct
     int items;   
 } 
 room;
-
+// List to use
 char *facility_rooms[] = {"Computers Area", "Laboratory", "Storage Room", "Armory", "Offices", "Basement Access",
                             "Atic Access", "Bedrooms", "Bathrooms", "Bar", "Kitchen", "Library"};
+
+
+char* commands[] = {"help", "move", "kill", "steal"};
 
 // innocent crew_members[CREW_MEMBERS];
 innocent crew_members[CREW_MEMBERS];
@@ -44,6 +48,7 @@ innocent crew_members[CREW_MEMBERS];
 // functions
 int prompt_int(char * message);
 void number_pressed(char * message, int required_number);
+void check_for_command(char *prompt);
 
 int main(void)
 {
@@ -89,8 +94,9 @@ int main(void)
         randomness[i] = (rand() % NAMES) + 2;
     }
     printf("\n");
+    
 
-    // Assign a random name for the crew members
+   // Assign a random name for the crew members
     int counter = 0;
     do
     {
@@ -220,22 +226,6 @@ int main(void)
                 else rooms[i].items = 1;
             }
         }
-        printf("===================================================================================\n");
-        printf(" __Welcome to the Command Line Movement Report System (CLMRS)__\n\n In [NAME] we appreciate data" 
-        " collection. You'll report every movement you make\n through the day. Use written commands"
-        " to tell us every action you do\n Thank you for letting us use you.");
-        printf("\n\n YOU HAVE 7 MOVEMENTS LEFT");
-        printf("\n===================================================================================\n");
-        printf("> Type \"help\" to see the commands\n");
-
-        printf("> ");
-        char *prompt[20];
-        scanf("%19s", prompt);
-
-        printf("Prompt: %s\n", prompt);
-
-
-
         // This also just prints the room name, how many items has and how many peoples are in it
         /*printf("\n");
         for (int i = 0; i < ROOMS_NUM; i++)
@@ -243,6 +233,24 @@ int main(void)
             printf("%s has %i items and %i people in it\n", rooms[i].name, rooms[i].items, rooms[i].people_in_it);
         }*/
 
+        // Command Line Message
+        printf("===================================================================================\n");
+        printf(" __Welcome to the Command Line Movement Report System (CLMRS)__\n\n In [NAME] we appreciate data" 
+        " collection. You'll report every movement you make\n through the day. Use written commands"
+        " to tell us every action you do\n Thank you for letting us use you.");
+        printf("\n\n YOU HAVE 7 MOVEMENTS LEFT");
+        printf("\n===================================================================================\n");
+        printf("> Type \"help\" to see the commands\n");
+        
+        int end_day = 0;
+        char prompt[20];
+        while (end_day == 0)
+        {
+            printf("> ");
+            scanf("%19[^\n]%*c", prompt);
+
+            check_for_command(prompt);
+        }
 
         ending = true;
         // While Player has movements Remaning
@@ -290,6 +298,7 @@ int prompt_int(char * message)
         scanf("%*[^\n]");
         numRead = scanf("%d", &number);
     }
+    while (getchar() != '\n');  // Empty stdin
     return number;
 }
 
@@ -301,4 +310,18 @@ void number_pressed(char * message, int required_number)
     {
         num = prompt_int(message);
     } while (num != required_number);
+}
+
+void check_for_command(char *prompt)
+{
+    int result = COMMANDS + 1;
+    for (int i = 0; i < COMMANDS; i++)
+    {
+        if (strcmp(prompt, commands[i]) == 0) result = i;
+    }
+
+    if (result == COMMANDS + 1)
+    {
+        printf("That is not a command, type \"help\" to see them\n");
+    }
 }
