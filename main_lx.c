@@ -5,50 +5,29 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <math.h>
-
+#include <commands.h>
 
 #define NAMES 70
-#define CREW_MEMBERS 9
 #define DAYS_TO_WORK 7
 #define LOOT_TO_STEAL 20
 #define MAX_BULLETS 2
-#define ROOMS_NUM 12
-#define COMMANDS 4
 
-// Define the Crew Stats
-typedef struct
-{
-    char name[20];
-    float mood;
-    bool alive;
-    int room;
-}
-innocent;
-// Define the Rooms characteristics
-typedef struct
-{
-    char name[20];
-    innocent people[CREW_MEMBERS];
-    int people_in_it;
-    bool previously_visited;
-    int items;   
-} 
-room;
 // List to use
 char *facility_rooms[] = {"Computers Area", "Laboratory", "Storage Room", "Armory", "Offices", "Basement Access",
                             "Atic Access", "Bedrooms", "Bathrooms", "Bar", "Kitchen", "Library"};
 
 
-char* commands[] = {"help", "move", "kill", "steal"};
+char* commands[] = {"help", "move", "steal", "kill", "clear", "people", "rooms"};
 
 // innocent crew_members[CREW_MEMBERS];
 innocent crew_members[CREW_MEMBERS];
+room rooms_list[ROOMS_NUM] = {0};
 
 // functions
 int prompt_int(char * message);
 void number_pressed(char * message, int required_number);
-void check_for_command(char *prompt);
+void command_prompt(char *prompt);
+void choose_command_function(int result);
 
 int main(void)
 {
@@ -58,7 +37,6 @@ int main(void)
     int WorkDay = 0; // Days worked
     int loot = 0; // Loot stealed
     int room_num_location;
-    room rooms[ROOMS_NUM] = {0};
 
     FILE *mercstats = fopen("mercstats.csv", "r");
 
@@ -125,7 +103,7 @@ int main(void)
     // Set all rooms
     for (int i = 0; i < ROOMS_NUM; i++)
     {
-        strcpy(rooms[i].name, facility_rooms[i]);
+        strcpy(rooms_list[i].name, facility_rooms[i]);
     }
 
     // Print House's Blueprints
@@ -133,18 +111,8 @@ int main(void)
     printf(" This facility has 2 floors. Each of them have 6 rooms in them. All faction members\n "
     "meet througt each day in the Main Room," 
     " located in the first floor. (Objects can't\n appear in here). You can see this info later.\n\n");
-    printf(" The first floor's rooms are:\n");
 
-    for (int i = 0, floor1 = (ROOMS_NUM / 2); i < floor1; i++)
-    {
-        printf("- %s\n", rooms[i].name);
-    }
-
-    printf("\n The second floor's rooms are:\n");
-    for (int i = (ROOMS_NUM / 2); i < ROOMS_NUM; i++)
-    {
-        printf("- %s\n", rooms[i].name);
-    }
+    rooms(rooms_list); // Print The Facility Rooms and their Floors
 
     printf("===================================================================================\n");
     number_pressed("> Type 1 to Begginn Day: ", 1);
@@ -176,11 +144,8 @@ int main(void)
         printf("\n===================================================================================\n");
 
         // Print Crew Members and their Status
-        for (int i = 0; i < CREW_MEMBERS; i++)
-        {
-            if (crew_members[i].alive) printf("- %s - %i\n", crew_members[i].name, (int)crew_members[i].mood);
-            else printf("- %s -> DEATH\n", crew_members[i].name);
-        }
+        people(CREW_MEMBERS, crew_members);
+        
         printf("\n");
 
         // Ammunition Given
@@ -196,14 +161,14 @@ int main(void)
         {
             room_num_location = rand() % 12;
             crew_members[i].room = room_num_location;
-            rooms[crew_members[i].room].people[i] = crew_members[i];
-            rooms[crew_members[i].room].people_in_it++; 
+            rooms_list[crew_members[i].room].people[i] = crew_members[i];
+            rooms_list[crew_members[i].room].people_in_it++; 
         }
 
-        // This just prints where is every crew, delete later
+        //This just prints where is every crew, delete later
         /*for (int i = 0; i < CREW_MEMBERS; i++)
         {
-            printf("%s is in %s\n", crew_members[i].name, rooms[crew_members[i].room].name);
+            printf("%s is in %s\n", crew_members[i].name, rooms_list[crew_members[i].room].name);
         }*/
         
         // Calculate Random Object Displacement for the House and Store in a Struct with the name of each the Room
@@ -213,24 +178,24 @@ int main(void)
             // ITEMS PROBABILTY: 10% none | 90% some --> 20% -> three | 30 % -> two | 50% -> one
             if (loot_probability > 9) // No obejcts
             {
-                rooms[i].items = 0;
+                rooms_list[i].items = 0;
             }
             else
             {
                 loot_probability = (rand() % 10) + 1; // re-roll
 
-                if (loot_probability <= 2) rooms[i].items = 3;
+                if (loot_probability <= 2) rooms_list[i].items = 3;
 
-                else if (loot_probability <= 5 && loot_probability > 2) rooms[i].items = 2;
+                else if (loot_probability <= 5 && loot_probability > 2) rooms_list[i].items = 2;
 
-                else rooms[i].items = 1;
+                else rooms_list[i].items = 1;
             }
         }
         // This also just prints the room name, how many items has and how many peoples are in it
         /*printf("\n");
         for (int i = 0; i < ROOMS_NUM; i++)
         {
-            printf("%s has %i items and %i people in it\n", rooms[i].name, rooms[i].items, rooms[i].people_in_it);
+            printf("%s has %i items and %i people in it\n", rooms_list[i].name, rooms_list[i].items, rooms_list[i].people_in_it);
         }*/
 
         // Command Line Message
@@ -246,10 +211,17 @@ int main(void)
         char prompt[20];
         while (end_day == 0)
         {
+            int lineRead = 0;
             printf("> ");
-            scanf("%19[^\n]%*c", prompt);
-
-            check_for_command(prompt);
+            lineRead = scanf("%19[^\n]%*c", prompt);
+            while(lineRead != 1) // Avoid Newline Loop Error
+            {
+                printf("That is not a command, type \"help\" to see them\n");
+                while (getchar() != '\n');
+                printf("> ");
+                lineRead = scanf("%19[^\n]%*c", prompt);
+            }            
+            command_prompt(prompt);
         }
 
         ending = true;
@@ -312,7 +284,7 @@ void number_pressed(char * message, int required_number)
     } while (num != required_number);
 }
 
-void check_for_command(char *prompt)
+void command_prompt(char *prompt)
 {
     int result = COMMANDS + 1;
     for (int i = 0; i < COMMANDS; i++)
@@ -323,5 +295,35 @@ void check_for_command(char *prompt)
     if (result == COMMANDS + 1)
     {
         printf("That is not a command, type \"help\" to see them\n");
+    }
+
+    choose_command_function(result);
+}
+
+void choose_command_function(int result)
+{
+    switch (result)
+    {
+        case 0:
+            help();
+            break;
+        case 1:
+            move();
+            break;
+        case 2:
+            steal();
+            break;
+        case 3:
+            kill();
+            break;
+        case 4:
+            clear();
+            break;
+        case 5:
+            people(CREW_MEMBERS, crew_members);
+            break;
+        case 6:
+            rooms(rooms_list);
+            break;
     }
 }
