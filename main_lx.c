@@ -9,15 +9,15 @@
 
 #define NAMES 70
 #define DAYS_TO_WORK 7
-#define LOOT_TO_STEAL 20
 #define MAX_BULLETS 2
+#define MOVEMENTS_PER_ROUND 10
 
 // List to use
 char *facility_rooms[] = {"Computers Area", "Laboratory", "Storage Room", "Armory", "Offices", "Basement Access",
                             "Atic Access", "Bedrooms", "Bathrooms", "Bar", "Kitchen", "Library"};
 
 
-char* commands[] = {"help", "move", "steal", "kill", "clear", "people", "rooms"};
+char* commands[] = {"help", "move", "steal", "kill", "clear", "people", "rooms", "roominfo"};
 
 // innocent crew_members[CREW_MEMBERS];
 innocent crew_members[CREW_MEMBERS];
@@ -26,7 +26,7 @@ room rooms_list[ROOMS_NUM] = {0};
 // functions
 int prompt_int(char * message);
 void number_pressed(char * message, int required_number);
-void command_prompt(char *prompt);
+int command_prompt(char *prompt);
 void choose_command_function(int result);
 
 int main(void)
@@ -37,6 +37,8 @@ int main(void)
     int WorkDay = 0; // Days worked
     int loot = 0; // Loot stealed
     int room_num_location;
+    int alive_members = CREW_MEMBERS;
+
 
     FILE *mercstats = fopen("mercstats.csv", "r");
 
@@ -91,12 +93,19 @@ int main(void)
 
     } while(counter < CREW_MEMBERS);
 
+    // Add String Terminator to All
+    for (int i = 0; i < CREW_MEMBERS; i++)
+    {
+        int length = strlen(crew_members[i].name);
+        crew_members[i].name[length] = '\0';
+    }
     // Set all then ALIVE and with MAX mood and Print the Crew Members
     for (int i = 0; i < CREW_MEMBERS; i++)
     {
         crew_members[i].alive = true;
         crew_members[i].room = 0;
         crew_members[i].mood = 100.0;
+        crew_members[i].discovered_player = false;
         //printf("crew %i: %s\n",i+1, crew_members[i].name);
     }
 
@@ -121,6 +130,9 @@ int main(void)
     // Main Loop
     while (!ending)
     {
+        int floor = 0;
+        int movements = MOVEMENTS_PER_ROUND;
+
         // See and Print the day number
         printf("\n===================================================================================\n");
         printf(" Day %i: %i Days Remaining || ", WorkDay + 1, DAYS_TO_WORK - WorkDay);
@@ -157,19 +169,22 @@ int main(void)
         // Print Movements Remainig
 
         // Calculate Random House Position for the Crews and Store in an Struct with the name of the Room
-        for (int i = 0; i < CREW_MEMBERS; i++)
+        for (int i = 0; i < ROOMS_NUM; i++)
         {
-            room_num_location = rand() % 12;
-            crew_members[i].room = room_num_location;
-            rooms_list[crew_members[i].room].people[i] = crew_members[i];
-            rooms_list[crew_members[i].room].people_in_it++; 
-        }
+            if (crew_members[i].alive)
+            {
+                room_num_location = rand() % ROOMS_NUM;
+                crew_members[i].room = room_num_location;
+                rooms_list[crew_members[i].room].people[i] = crew_members[i];
+                rooms_list[crew_members[i].room].people_in_it++;
+            } 
+        } 
 
         //This just prints where is every crew, delete later
-        /*for (int i = 0; i < CREW_MEMBERS; i++)
+        for (int i = 0; i < CREW_MEMBERS; i++)
         {
             printf("%s is in %s\n", crew_members[i].name, rooms_list[crew_members[i].room].name);
-        }*/
+        }
         
         // Calculate Random Object Displacement for the House and Store in a Struct with the name of each the Room
         for (int i = 0; i < ROOMS_NUM; i++)
@@ -203,16 +218,30 @@ int main(void)
         printf(" __Welcome to the Command Line Movement Report System (CLMRS)__\n\n In [NAME] we appreciate data" 
         " collection. You'll report every movement you make\n through the day. Use written commands"
         " to tell us every action you do\n Thank you for letting us use you.");
-        printf("\n\n YOU HAVE 7 MOVEMENTS LEFT");
+        printf("\n\n YOU HAVE %i MOVEMENTS LEFT", movements);
         printf("\n===================================================================================\n");
         printf("> Type \"help\" to see the commands\n");
-        
+
         int end_day = 0;
         char prompt[20];
+        int place_message = 0;
+        ammo = 1;
         while (end_day == 0)
         {
             int lineRead = 0;
-            printf("> ");
+            // Print > withe the name of the current room
+            for (int i = 0; i < ROOMS_NUM; i++)
+            {
+                if (rooms_list[i].player_in)
+                {
+                    printf("/%s/> ", rooms_list[i].name);
+                    place_message = 1;
+                    break;
+                }
+                else place_message = 0;
+            }
+            if (place_message == 0) printf("> ");
+
             lineRead = scanf("%19[^\n]%*c", prompt);
             while(lineRead != 1) // Avoid Newline Loop Error
             {
@@ -221,8 +250,42 @@ int main(void)
                 printf("> ");
                 lineRead = scanf("%19[^\n]%*c", prompt);
             }            
-            command_prompt(prompt);
+            int result = command_prompt(prompt);
+
+            switch (result)
+            {
+                case 0:
+                    help();
+                    break;
+                case 1:
+                    move(&floor, &movements, crew_members, rooms_list);
+                    break;
+                case 2:
+                    steal(&loot, &movements, crew_members, rooms_list);
+                    break;
+                case 3:
+                    kill(crew_members, rooms_list, &movements, &ammo);
+                    break;
+                case 4:
+                    clear();
+                    break;
+                case 5:
+                    printf("===================================================================================\n");
+                    people(CREW_MEMBERS, crew_members);
+                    printf("===================================================================================\n");
+                    break;
+                case 6:
+                    printf("===================================================================================\n");
+                    rooms(rooms_list);
+                    printf("===================================================================================\n");
+                    break;
+                case 7:
+                    roominfo(crew_members, rooms_list);
+            }
+            if (movements == 0) end_day = 1;
         }
+
+        printf("salí\n");
 
         ending = true;
         // While Player has movements Remaning
@@ -284,7 +347,7 @@ void number_pressed(char * message, int required_number)
     } while (num != required_number);
 }
 
-void command_prompt(char *prompt)
+int command_prompt(char *prompt)
 {
     int result = COMMANDS + 1;
     for (int i = 0; i < COMMANDS; i++)
@@ -297,33 +360,5 @@ void command_prompt(char *prompt)
         printf("That is not a command, type \"help\" to see them\n");
     }
 
-    choose_command_function(result);
-}
-
-void choose_command_function(int result)
-{
-    switch (result)
-    {
-        case 0:
-            help();
-            break;
-        case 1:
-            move();
-            break;
-        case 2:
-            steal();
-            break;
-        case 3:
-            kill();
-            break;
-        case 4:
-            clear();
-            break;
-        case 5:
-            people(CREW_MEMBERS, crew_members);
-            break;
-        case 6:
-            rooms(rooms_list);
-            break;
-    }
+    return result;
 }
