@@ -29,8 +29,8 @@ typedef struct
 
 void help(void);
 void move(int *floor, int *movements, innocent crew_members[], room rooms_list[]);
-void kill(innocent crew_members[], room rooms_list[], int *movements, int *gun);
-void steal(int *loot, int *movements, innocent crew_members[], room rooms_list[]);
+void kill(innocent crew_members[], room rooms_list[], int *movements, int *gun, int *caught, int *end_day, bool *bad_ending);
+void steal(int *loot, int *movements, innocent crew_members[], room rooms_list[], int *gun, int *caught, int *end_day, bool *bad_ending);
 void clear(void);
 void people(int people_number, innocent crew_members[]);
 void rooms(room rooms_list[]);
@@ -38,7 +38,8 @@ void roominfo(innocent crew_members[], room rooms_list[]);
 
 // User cannot use these
 
-void discovered(void);
+void discovered(innocent crew_members[], room rooms_list[], int room_num, int *caught);
 int prompt_int(char * message);
+void number_pressed(char * message, int required_number);
 void mood_steal(int iterations_to_room, innocent crew_members[], room rooms_list[]);
-
+void witnesses_kill(innocent crew_members[], room rooms_list[], int *movements, int *gun, int *end_day, bool *bad_ending, int * caught);

@@ -38,6 +38,7 @@ int main(void)
     int loot = 0; // Loot stealed
     int room_num_location;
     int alive_members = CREW_MEMBERS;
+    int caught = 0;
 
 
     FILE *mercstats = fopen("mercstats.csv", "r");
@@ -225,7 +226,6 @@ int main(void)
         int end_day = 0;
         char prompt[20];
         int place_message = 0;
-        ammo = 1;
         while (end_day == 0)
         {
             int lineRead = 0;
@@ -251,43 +251,56 @@ int main(void)
                 lineRead = scanf("%19[^\n]%*c", prompt);
             }            
             int result = command_prompt(prompt);
-
-            switch (result)
+            
+            if (caught == 0)
             {
-                case 0:
-                    help();
-                    break;
-                case 1:
-                    move(&floor, &movements, crew_members, rooms_list);
-                    break;
-                case 2:
-                    steal(&loot, &movements, crew_members, rooms_list);
-                    break;
-                case 3:
-                    kill(crew_members, rooms_list, &movements, &ammo);
-                    break;
-                case 4:
-                    clear();
-                    break;
-                case 5:
-                    printf("===================================================================================\n");
-                    people(CREW_MEMBERS, crew_members);
-                    printf("===================================================================================\n");
-                    break;
-                case 6:
-                    printf("===================================================================================\n");
-                    rooms(rooms_list);
-                    printf("===================================================================================\n");
-                    break;
-                case 7:
-                    roominfo(crew_members, rooms_list);
+                switch (result)
+                {
+                    case 0:
+                        help();
+                        break;
+                    case 1:
+                        move(&floor, &movements, crew_members, rooms_list);
+                        break;
+                    case 2:
+                        steal(&loot, &movements, crew_members, rooms_list, &ammo, &caught,&end_day, &lose);
+                        break;
+                    case 3:
+                        kill(crew_members, rooms_list, &movements, &ammo, &caught, &end_day, &lose);
+                        break;
+                    case 4:
+                        clear();
+                        break;
+                    case 5:
+                        printf("===================================================================================\n");
+                        people(CREW_MEMBERS, crew_members);
+                        printf("===================================================================================\n");
+                        break;
+                    case 6:
+                        printf("===================================================================================\n");
+                        rooms(rooms_list);
+                        printf("===================================================================================\n");
+                        break;
+                    case 7:
+                        roominfo(crew_members, rooms_list);
+                }
             }
+            while(caught) witnesses_kill(crew_members, rooms_list, &movements, &ammo, &end_day, &lose, &caught);
             if (movements == 0) end_day = 1;
         }
 
         printf("salí\n");
 
-        ending = true;
+        if (lose == true)
+        {
+            printf("Bad Ending\n");
+            ending = 1;
+        }
+        else
+        {
+            printf("Normal Ending\n");
+            ending = 1;
+        }
         // While Player has movements Remaning
             // If Player Moves to N room, print Objects and People in there -> Movements Remaining --
             // Player Inputs his action 

@@ -123,7 +123,7 @@ void roominfo(innocent crew_members[], room rooms_list[])
 }
 
 // Steal Mechanic and its Consequences
-void steal(int *loot, int *movements, innocent crew_members[], room rooms_list[])
+void steal(int *loot, int *movements, innocent crew_members[], room rooms_list[], int *gun, int *caught, int *end_day, bool *bad_ending)
 {
     int player_is_in_room = 0, random_num = 0;
     float chance_to_fail = 0, mood_average = 0;
@@ -152,7 +152,7 @@ void steal(int *loot, int *movements, innocent crew_members[], room rooms_list[]
                 {
                     printf("chance to fail %f, mood avg %f, random num %i\n", chance_to_fail, mood_average, random_num);
                     printf("room people %i\n", rooms_list[i].people_in_it);
-                    discovered();
+                    discovered(crew_members, rooms_list, i, caught);
                 }
                 else // Steal Done Successufully
                 {
@@ -196,11 +196,10 @@ void mood_steal(int iterations_to_room, innocent crew_members[], room rooms_list
     }
 }
 
-void kill(innocent crew_members[], room rooms_list[], int *movements, int *gun)
+void kill(innocent crew_members[], room rooms_list[], int *movements, int *gun, int *caught, int *end_day, bool *bad_ending)
 {
     int player_is_in_room = 0, iterations = 0, weapon = 100, victim = 100;
-    int lineRead = 0, proceed = 0;
-    char answer_buffer[20];
+    int proceed = 0, knife_probability = 0;
 
     for (int current_room = 0; current_room < ROOMS_NUM; current_room++)
     {
@@ -239,7 +238,7 @@ void kill(innocent crew_members[], room rooms_list[], int *movements, int *gun)
             printf("===================================================================================\n");
             while (weapon < 1 || weapon > 2)
             {
-                weapon = prompt_int("/kill/innocent/> ");
+                weapon = prompt_int("/kill/weapon/> ");
                 if (weapon == 101) break;
             }
             if (weapon == 101) break;
@@ -261,6 +260,7 @@ void kill(innocent crew_members[], room rooms_list[], int *movements, int *gun)
                             if (victim != kill_iteration) kill_iteration++;
                             if (victim == kill_iteration)
                             {
+                                // Kill Confirmation
                                 printf("===================================================================================\n");
                                 printf(" > Type the number - Proceed on killing [%s]?\n\n", crew_members[i].name);
                                 printf(" 1- Yes\n 2- No\n\n");
@@ -270,18 +270,26 @@ void kill(innocent crew_members[], room rooms_list[], int *movements, int *gun)
                                 {
                                     proceed = prompt_int("/kill/gun/confirm/> ");
                                 }
-                                if (proceed == 2) 
-                                {
-                                    printf("FAILED! Cancelled.\n");
-                                    break;
-                                }
-                                crew_members[i].alive = false;
+                                if (proceed == 2) break; // Kill Canceled
+                                printf("===================================================================================\n");
+                                crew_members[i].alive = false; // Kill Done Successfully
+                                rooms_list[current_room].people_in_it--;
                                 *gun = *gun - 1;
-                                printf(" > %s is dead.\n", crew_members[i].name);
+                                printf(" >> %s is dead <<\n", crew_members[i].name);
 
                                 if(*gun == 0)
                                 {
-                                    printf("Ammunition Depleted\n");
+                                    printf(" >> Ammunition Depleted <<\n"); // Referencias ;)
+                                }
+                                else{
+                                    printf(" >> [%i] Bullets Left <<\n", *gun);
+                                }
+                                printf("===================================================================================\n");
+                                number_pressed("> Type 1 to continue: ", 1);
+                                // If there's someone else in the room --> DISCOVERED
+                                if(rooms_list[current_room].people_in_it > 0)
+                                {
+                                    discovered(crew_members, rooms_list, current_room, caught);
                                 }
                                 break;
                             }
@@ -289,18 +297,49 @@ void kill(innocent crew_members[], room rooms_list[], int *movements, int *gun)
                     }
                     break;
                 case 2:
-                    printf("Elegiste el Cuchillo\n");
+                    for (int i = 0; i < CREW_MEMBERS; i++)
+                    {
+                        if (crew_members[i].room == current_room && crew_members[i].alive == true)
+                        {
+                            if (victim != kill_iteration) kill_iteration++;
+                            if (victim == kill_iteration)
+                            {
+                                // Kill Confirmation
+                                printf("===================================================================================\n");
+                                printf(" > Type the number - Proceed on killing [%s]?\n", crew_members[i].name);
+                                printf(" > Note: Using the Knife as a Primary Offensive Weapon is highly unrecommended.\n\n");
+                                printf(" 1- Yes\n 2- No\n\n");
+                                printf("===================================================================================\n");
+                                
+                                while (proceed < 1 || proceed > 2)
+                                {
+                                    proceed = prompt_int("/kill/knife/confirm/> ");
+                                }
+                                if (proceed == 2) break; // Kill Canceled
+                                printf("===================================================================================\n");
+
+                                knife_probability = (rand() % 100) + 1;
+                                if (knife_probability > 80) // 60 | 40 --> FAILURE|SUCCESS
+                                {
+                                    crew_members[i].alive = false; // Kill Done Successfully
+                                    rooms_list[current_room].people_in_it--;
+                                    printf(" >> %s is dead <<\n", crew_members[i].name); 
+                                }
+                                else
+                                {
+                                    discovered(crew_members, rooms_list, current_room, caught);
+                                }
+                                break;
+                            }
+                        }
+                    }
             }
-            
-
-
         }
-
     }
     printf("===================================================================================\n");
     if (player_is_in_room == 0)
     {
-        printf("You are not in a  Room\n");
+        printf("You are not in a Room\n");
     }
 }
 
@@ -336,7 +375,162 @@ void rooms(room rooms_list[])
     }
 }
 
-void discovered(void)
+void discovered(innocent crew_members[], room rooms_list[], int room_num, int *caught)
 {
-    printf("Patata\n");
+    system("clear"); //CHANGE TO cls FOR WINDOWS
+    printf("===================================================================================\n");
+    int messages = (rand() % 5) + 1;
+
+    for (int i = 0; i < CREW_MEMBERS; i++)
+    {
+        if (crew_members[i].room == room_num && crew_members[i].alive == true)
+        {
+        printf(" %s: ", crew_members[i].name);
+        break;
+        }
+    }
+    
+    switch (messages)
+    {
+        case 1:
+            printf("GOT YOU! You damn snake.\n");
+            break;
+        case 2:
+            printf("STOP RIGHT THERE!\n");
+            break;
+        case 3:
+            printf("You Filthy Rat. FREEZE!!\n");
+            break;
+        case 4:
+            printf("I'll send you to hell. You filthy rat!\n");
+            break;
+        case 5:
+            printf("COME RIGHT HERE, COWARD!!\n");
+            break;
+    }
+
+    *caught = 1;
 }
+
+void witnesses_kill(innocent crew_members[], room rooms_list[], int *movements, int *gun, int *end_day, bool *bad_ending, int *caught)
+{
+    int iterations = 0, kill_choose = 0, weapon = 0;
+
+    printf(">> You have been discovered. You must kill all the witnesses <<\n");
+    printf(" > Choose the corresponding Number and Kill them All: \n\n");
+
+    for (int current_room = 0; current_room < ROOMS_NUM; current_room++)
+    {
+        if (rooms_list[current_room].player_in)
+        {
+            for (int i = 0; i < CREW_MEMBERS; i++)
+            {
+                if (crew_members[i].room == current_room && crew_members[i].alive == true)
+                {
+                    printf(" %i-%s\n", iterations + 1, crew_members[i].name);
+                    iterations++;
+                }
+            }
+            printf("===================================================================================\n");
+
+            while (kill_choose < 1 || kill_choose > rooms_list[current_room].people_in_it)
+            {
+                kill_choose = prompt_int("/discovered/> ");
+            }
+            
+            printf("===================================================================================\n");
+            printf(" Type the number of the weapon you want to use:\n\n");
+            printf(" 1- Gun (%i Bullets Left)\n 2- Knife\n\n", *gun);
+            printf("===================================================================================\n");
+            while (weapon < 1 || weapon > 2)
+            {
+                weapon = prompt_int("/kill/weapon/> ");
+            }
+
+            int kill_iteration = 0;
+            switch (weapon)
+            {
+                case 1:
+                    if (*gun <= 0)
+                    {
+                        printf("FAILED! You don't have bullets.\n");
+                        printf("===================================================================================\n");
+                        return;
+                    }
+                    for (int i = 0; i < CREW_MEMBERS; i++)
+                    {
+                        if (crew_members[i].room == current_room && crew_members[i].alive == true)
+                        {
+                            if (kill_choose != kill_iteration) kill_iteration++;
+                            if (kill_choose == kill_iteration)
+                            {
+                                printf("===================================================================================\n");
+                                crew_members[i].alive = false; // Kill Done Successfully
+                                rooms_list[current_room].people_in_it--;
+                                *gun = *gun - 1;
+                                printf(" >> %s is dead <<\n", crew_members[i].name);
+
+                                if(*gun == 0)
+                                {
+                                    printf(" >> Ammunition Depleted <<\n"); // Referencias ;)
+                                }
+                                else{
+                                    printf(" >> [%i] Bullets Left <<\n", *gun);
+                                }
+                                printf("===================================================================================\n");
+                                number_pressed("> Type 1 to continue: ", 1);
+                                // If there's someone else in the room --> DISCOVERED
+                                if(rooms_list[current_room].people_in_it == 0)
+                                {
+                                    *caught = 0;
+                                }
+                                else
+                                {
+                                    discovered(crew_members, rooms_list, current_room, caught);
+                                }
+                                break;
+                            }
+                        }
+                    }
+            
+                case 2:
+                    for (int i = 0; i < CREW_MEMBERS; i++)
+                    {
+                        if (crew_members[i].room == current_room && crew_members[i].alive == true)
+                        {
+                            if (kill_choose != kill_iteration) kill_iteration++;
+                            if (kill_choose == kill_iteration)
+                            {
+                                int knife_probability = (rand() % 100) + 1;
+                                if (knife_probability > 80) // 60 | 40 --> FAILURE|SUCCESS
+                                {
+                                    crew_members[i].alive = false; // Kill Done Successfully
+                                    rooms_list[current_room].people_in_it--;
+                                    printf(" >> %s is dead <<\n", crew_members[i].name); 
+                                }
+                                else
+                                {
+                                    *end_day = 1;
+                                    *bad_ending = 1;
+                                }
+
+                                if(rooms_list[current_room].people_in_it == 0)
+                                {
+                                    *caught = 0;
+                                }
+                                else
+                                {
+                                    discovered(crew_members, rooms_list, current_room, caught);
+                                }
+                                break;
+                            }
+                        }
+                    }
+            }
+        }
+    }
+}
+
+
+
+
