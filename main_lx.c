@@ -7,7 +7,7 @@
 #include <time.h>
 #include <commands.h>
 
-#define NAMES 70
+#define NAMES 71
 #define DAYS_TO_WORK 7
 #define MAX_BULLETS 2
 #define MOVEMENTS_PER_ROUND 10
@@ -27,13 +27,13 @@ room rooms_list[ROOMS_NUM] = {0};
 int prompt_int(char * message);
 void number_pressed(char * message, int required_number);
 int command_prompt(char *prompt);
-void choose_command_function(int result);
+void increse_paranoia_if_kill(innocent crew_members[]);
 
 int main(void)
 {
     char buffer[1000];
     char *data;
-    bool ending = false, win = false, lose = false; // To check game finished state
+    bool ending = false; // To check game finished state
     int WorkDay = 0; // Days worked
     int loot = 0; // Loot stealed
     int room_num_location;
@@ -42,13 +42,18 @@ int main(void)
 
 
     FILE *mercstats = fopen("mercstats.csv", "r");
+    if (mercstats == NULL)
+    {
+        printf("Couldn't find the Names file. Please execute the program in the same folder with it.\n");
+        exit(0);
+    }
 
     // Welcome message
 
     printf("\n===================================================================================\n");
     printf("\t\t\t\tMESSAGE RECIEVED\n");
-    printf("\n Welcome once more and possibly last to [INSERTAR NOMBRE TO EPICO]\n We are in the climax of the war with our"
-    " enemy faction [INSERTAR NOMBRE TO EPICO]\n It's vital to us that you get to infiltrate in one of their many bases and "
+    printf("\n Welcome once more and possibly last to MendedSun\n We are in the climax of the war with our"
+    " enemy faction BrokenMoon\n It's vital to us that you get to infiltrate in one of their many bases and "
     "STEAL\n as much information and valuable objects as you can.\n\n");
     printf(" Be careful though, some of your \"colleagues\" may be either aware or alert for you\n");
     printf("\n===================================================================================\n");
@@ -133,24 +138,48 @@ int main(void)
     {
         int floor = 0;
         int movements = MOVEMENTS_PER_ROUND;
+        int room_discovered;
+        int failing_chance_steal = 0;
+
+        for (int i = 0; i < ROOMS_NUM; i++)
+        {
+            rooms_list[i].people_in_it = 0;
+        }
 
         // See and Print the day number
         printf("\n===================================================================================\n");
-        printf(" Day %i: %i Days Remaining || ", WorkDay + 1, DAYS_TO_WORK - WorkDay);
         
-        // If deathline is over and not all objects have been collected
-            // Lose -> END
-        /*if (WorkDay == DAYS_TO_WORK && loot < LOOT_TO_STEAL)
+        //if (WorkDay == DAYS_TO_WORK && loot < LOOT_TO_STEAL)
+        if (WorkDay == DAYS_TO_WORK && loot != LOOT_TO_STEAL)
         {
-            bad_noquota_ending();
+            bad_quota_ending();
         }
+        
         // If all objects have been collected no matter the day
-            // Win -> END
         if (loot >= LOOT_TO_STEAL)
         {
             good_quota_ending();
-        }*/
+        }
 
+        bool all_death = false;
+        for (int i = 0; i < CREW_MEMBERS; i++)
+        {
+            if (crew_members[i].alive == true)
+            {
+                all_death = false;
+                break;
+            }
+            else{
+                all_death = true;
+            }
+        }
+
+        if (all_death)
+        {
+            all_death_ending();
+        }
+    
+        printf(" Day %i: %i Days Remaining || ", WorkDay + 1, DAYS_TO_WORK - WorkDay);
         // Print Remaining Objects to Steal
         printf("%i/%i Objects || ", loot, LOOT_TO_STEAL);
         printf("FACTION MEMBERS' STATUS -> Name - Mood");
@@ -160,7 +189,21 @@ int main(void)
         people(CREW_MEMBERS, crew_members);
         
         printf("\n");
-
+        for (int i = 0; i < CREW_MEMBERS; i++)
+        {
+            if (crew_members[i].alive == false)
+            {
+                printf("* %s didn't came to work.\n", crew_members[i].name);
+            }
+        }
+        for (int i = 0; i < CREW_MEMBERS; i++)
+        {
+            if (crew_members[i].alive == false)
+            {
+                printf("\n- Everyone is a little bit more nervous\n\n");
+                break;
+            }
+        }
         // Ammunition Given
         int ammo = (rand() % MAX_BULLETS) + 1;
         printf("- You have recieved a Knife and a Gun with %i shots", ammo);
@@ -182,10 +225,10 @@ int main(void)
         } 
 
         //This just prints where is every crew, delete later
-        for (int i = 0; i < CREW_MEMBERS; i++)
+        /*for (int i = 0; i < CREW_MEMBERS; i++)
         {
             printf("%s is in %s\n", crew_members[i].name, rooms_list[crew_members[i].room].name);
-        }
+        }*/
         
         // Calculate Random Object Displacement for the House and Store in a Struct with the name of each the Room
         for (int i = 0; i < ROOMS_NUM; i++)
@@ -216,13 +259,14 @@ int main(void)
 
         // Command Line Message
         printf("===================================================================================\n");
-        printf(" __Welcome to the Command Line Movement Report System (CLMRS)__\n\n In [NAME] we appreciate data" 
+        printf(" __Welcome to the Command Line Movement Report System (CLMRS)__\n\n In MendedSun we appreciate data" 
         " collection. You'll report every movement you make\n through the day. Use written commands"
         " to tell us every action you do\n Thank you for letting us use you.");
         printf("\n\n YOU HAVE %i MOVEMENTS LEFT", movements);
         printf("\n===================================================================================\n");
         printf("> Type \"help\" to see the commands\n");
 
+        // Loop Trough Day
         int end_day = 0;
         char prompt[20];
         int place_message = 0;
@@ -263,10 +307,10 @@ int main(void)
                         move(&floor, &movements, crew_members, rooms_list);
                         break;
                     case 2:
-                        steal(&loot, &movements, crew_members, rooms_list, &ammo, &caught,&end_day, &lose);
+                        steal(&loot, &movements, crew_members, rooms_list, &ammo, &caught,&end_day, &room_discovered);
                         break;
                     case 3:
-                        kill(crew_members, rooms_list, &movements, &ammo, &caught, &end_day, &lose);
+                        kill(crew_members, rooms_list, &movements, &ammo, &caught, &end_day, &room_discovered);
                         break;
                     case 4:
                         clear();
@@ -285,50 +329,37 @@ int main(void)
                         roominfo(crew_members, rooms_list);
                 }
             }
-            while(caught) witnesses_kill(crew_members, rooms_list, &movements, &ammo, &end_day, &lose, &caught);
-            if (movements == 0) end_day = 1;
+            if (caught == 1) 
+            {
+                discovered(crew_members, rooms_list, room_discovered, &caught, &ammo);
+            }
+            if (movements == 0) 
+            {
+                for (int i = 0; i < ROOMS_NUM; i++) rooms_list[i].player_in = 0;
+                system("clear");
+                end_day = 1;
+            }
         }
+        // End Loop Trough Day
 
-        printf("salí\n");
+        // Increase Crew paranoia proportionally to the number of death crew_members
+        increse_paranoia_if_kill(crew_members);
+        WorkDay++;
 
-        if (lose == true)
+        int death_members = 0;
+        printf("===================================================================================\n");
+        printf(" The shift has ended:\n\n");
+        printf("- %i/%i Objects\n", loot, LOOT_TO_STEAL);
+        for (int i = 0; i < CREW_MEMBERS; i++)
         {
-            printf("Bad Ending\n");
-            ending = 1;
+            if (crew_members[i].alive == false)
+            {
+                death_members++;
+            }
         }
-        else
-        {
-            printf("Normal Ending\n");
-            ending = 1;
-        }
-        // While Player has movements Remaning
-            // If Player Moves to N room, print Objects and People in there -> Movements Remaining --
-            // Player Inputs his action 
-            //If STEAL
-                // Check CREWs in the room stats and Calculate the chances of success
-                    // If success
-                        // Objects to Steal --
-                        // Crews in the room Paranoia ++
-                        // Movements Remaining --
-                    // If discovered and Bullets != 0 and Crew memebers in the room < 3
-                        // Print "discovered", use as many bullets as crews in the room
-                        // Bullets--
-                        // Movements Remaining --
-                    // Else
-                        // Lose -> END
-            //If Kill
-                // Ask to use knife or Gun
-                // If GUN
-                    // Kill Crew Member
-                    // Check if someone else saw it
-                    // If discovered and Bullets != 0 and Crew memebers in the room < 3
-                        // Print "discovered", use as many bullets as crews in the room
-                        // Bullets--
-                        // Movements Remaining --
-                    // Else
-                        // Lose -> END
-
-            // Increase Crew paranoia proportionally to the number of death crew_members
+        printf("- %i People died until now\n\n", death_members);
+        printf("===================================================================================\n");
+        number_pressed("> Type 1 to beggin the next day: ", 1);
     }
     // Close the Names file
     fclose(mercstats);
@@ -374,4 +405,24 @@ int command_prompt(char *prompt)
     }
 
     return result;
+}
+
+void increse_paranoia_if_kill(innocent crew_members[])
+{
+    int death_members = 0;
+    for (int i = 0; i < CREW_MEMBERS; i++)
+    {   
+        if (crew_members[i].alive == false)
+        {
+            death_members++;
+        }
+    }
+
+    for (int i = 0; i < CREW_MEMBERS; i++)
+    {
+        if (crew_members[i].alive)
+        {
+            crew_members[i].mood = crew_members[i].mood - ((rand() % 20) + 15) * death_members;
+        }
+    }
 }
