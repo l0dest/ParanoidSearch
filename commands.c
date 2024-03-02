@@ -144,6 +144,7 @@ void roominfo(innocent crew_members[], room rooms_list[])
         }
     }
     printf("You are not in a Room right now. Type \"move\" and go to one to consult information.\n");
+    printf("===================================================================================\n");
 }
 
 // Steal Mechanic and its Consequences
@@ -615,4 +616,11 @@ void all_death_ending(void)
     printf("===================================================================================\n");
     number_pressed("> Type 1 to exit: ", 1);
     exit(0);
+}
+
+void info(int *WorkDay, int*loot)
+{
+    printf("===================================================================================\n");
+    printf(" Day %i of %i | You have %i/%i Objects\n", *WorkDay + 1, DAYS_TO_WORK, *loot, LOOT_TO_STEAL);
+    printf("===================================================================================\n");
 }

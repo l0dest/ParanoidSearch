@@ -1,9 +1,10 @@
 #include <stdbool.h>
 
 #define CREW_MEMBERS 9 // People with you in the game (you lost btw)
-#define COMMANDS 8 // Number of Console Commands (The functions below)
+#define COMMANDS 9 // Number of Console Commands (The functions below)
 #define ROOMS_NUM 12
 #define LOOT_TO_STEAL 20
+#define DAYS_TO_WORK 7
 
 // Innocent Struct
 typedef struct
@@ -35,6 +36,7 @@ void clear(void);
 void people(int people_number, innocent crew_members[]);
 void rooms(room rooms_list[]);
 void roominfo(innocent crew_members[], room rooms_list[]);
+void info(int *WorkDay, int*loot);
 
 // User cannot use these
 

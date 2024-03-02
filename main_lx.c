@@ -8,7 +8,6 @@
 #include <commands.h>
 
 #define NAMES 71
-#define DAYS_TO_WORK 7
 #define MAX_BULLETS 2
 #define MOVEMENTS_PER_ROUND 8
 
@@ -17,7 +16,7 @@ char *facility_rooms[] = {"Computers Area", "Laboratory", "Storage Room", "Armor
                             "Atic Access", "Bedrooms", "Bathrooms", "Bar", "Kitchen", "Library"};
 
 
-char* commands[] = {"help", "move", "steal", "kill", "clear", "people", "rooms", "roominfo"};
+char* commands[] = {"help", "move", "steal", "kill", "clear", "people", "rooms", "roominfo", "info"};
 
 // innocent crew_members[CREW_MEMBERS];
 innocent crew_members[CREW_MEMBERS];
@@ -327,6 +326,10 @@ int main(void)
                         break;
                     case 7:
                         roominfo(crew_members, rooms_list);
+                        break;
+                    case 8:
+                        info(&WorkDay, &loot);
+                        break;
                 }
             }
             if (caught == 1) 
@@ -336,6 +339,9 @@ int main(void)
             if (movements == 0) 
             {
                 for (int i = 0; i < ROOMS_NUM; i++) rooms_list[i].player_in = 0;
+                printf(" 0 MOVEMENTS LEFT - SHIFT COMPLETED\n");
+                printf("===================================================================================\n");
+                number_pressed("> Type 1 to continue: ", 1);
                 system("clear");
                 end_day = 1;
             }
@@ -360,6 +366,7 @@ int main(void)
         printf("- %i People died until now\n\n", death_members);
         printf("===================================================================================\n");
         number_pressed("> Type 1 to beggin the next day: ", 1);
+        system("clear");
     }
     // Close the Names file
     fclose(mercstats);
