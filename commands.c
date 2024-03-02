@@ -9,13 +9,13 @@ void help(void)
     printf("===================================================================================\n");
     printf(" Enterprise Macro Systems - CLMRS version 6.7 - [MendedSun]\n\n");
     printf(" help : prints this list.\n\n");
-    printf(" move : let you move thorught rooms, select the number of the choosen one\n"
-    " (cost 1 movement).\n\n");
-    printf(" roominfo : prints the number of people, objects in the current room and chances\n to get caught if you steal.\n\n");
+    printf(" move : let you move trough rooms, select the number of the choosen one"
+    " (cost 1\n movement).\n\n");
+    printf(" roominfo : prints the number of people, objects and chances to get caught if you\n steal in the current room.\n\n");
     printf(" steal : once in a room, if there are objects, steal one of them. (cost 1 movement\n"
-    " and can get caught by alert collegues).\n\n");
-    printf(" kill : select to kill a collegue, using the gun gives you 100%% chances of\n success, "
-    "using the knife gives you a 20%% chances of success. If someone sees you,\n you get discovered and must kill them.\n\n");
+    " and can get caught by colleagues based on their mood).\n\n");
+    printf(" kill : select to kill a collegue, using the gun gives you 100%% chances of success,\n "
+    "using the knife gives you a 20%% chances of success. If someone sees you, you get\n discovered and must kill them.\n\n");
     printf(" people : prints your colleagues stats.\n\n rooms : prints the rooms of the facility.\n\n");
     printf(" clear : clears console.\n");
     printf("===================================================================================\n");
@@ -130,6 +130,7 @@ void roominfo(innocent crew_members[], room rooms_list[])
                 }
             }
             mood_average = mood_average / rooms_list[i].people_in_it;
+            if (mood_average < 1) mood_average = 1;
             // numPeople * 5 / average_mood * 100
             chance_to_fail = (((rooms_list[i].people_in_it) * 5) / (mood_average)) * 100;
             if (chance_to_fail < 0) chance_to_fail = 0;
@@ -169,6 +170,7 @@ void steal(int *loot, int *movements, innocent crew_members[], room rooms_list[]
                 }
                 mood_average = mood_average / rooms_list[i].people_in_it;
                 // numPeople * 5 / average_mood * 100
+                if (mood_average < 1) mood_average = 1;
                 chance_to_fail = (((rooms_list[i].people_in_it) * 5) / (mood_average)) * 100;
                 random_num = (rand() % 100) + 1;
 
@@ -188,7 +190,7 @@ void steal(int *loot, int *movements, innocent crew_members[], room rooms_list[]
                     *loot = *loot + 1;
                     *movements = *movements - 1;
                     steal_done = 1;
-                    printf("chance to fail %i, mood avg %f, random num %i\n", chance_to_fail, mood_average, random_num);
+                    // printf("chance to fail %i, mood avg %f, random num %i\n", chance_to_fail, mood_average, random_num);
                     printf("You took and Object | %i/%i Objects | %i Movements Left\n", *loot, LOOT_TO_STEAL, *movements);
                     mood_steal(i, crew_members, rooms_list);
                     printf("===================================================================================\n");
@@ -205,7 +207,7 @@ void steal(int *loot, int *movements, innocent crew_members[], room rooms_list[]
     // If PLayer is not in a Room
     if (player_is_in_room == 0)
     {
-        printf("You are not in a Room, type \"move\", pick one and type \"roominfo\" to see its items.\n");
+        printf("You are not in a Room. Type \"move\", pick one and type \"roominfo\" to see its items.\n");
         printf("===================================================================================\n");
     }
 }
@@ -219,7 +221,11 @@ void mood_steal(int iterations_to_room, innocent crew_members[], room rooms_list
         if (crew_members[i].alive == true && crew_members[i].room == iterations_to_room)
         {
             decrease_rate = (rand() % 15) + 1;
-            crew_members[i].mood = crew_members[i].mood - decrease_rate; 
+            crew_members[i].mood = crew_members[i].mood - decrease_rate;
+            if (crew_members[i].mood < 0)
+            {
+                crew_members[i].mood = 0;
+            } 
         }
     }
 }
@@ -234,6 +240,12 @@ void kill(innocent crew_members[], room rooms_list[], int *movements, int *gun, 
         if (rooms_list[current_room].player_in)
         {
             player_is_in_room = 1;
+
+            if (rooms_list[current_room].people_in_it == 0)
+            {
+                printf("There are no people here, unable to kill\n");
+                break;
+            }
             printf("===================================================================================\n");
             printf(" Type the Number Corresponding at the member:\n\n");
             for (int i = 0; i < CREW_MEMBERS; i++)
@@ -246,11 +258,7 @@ void kill(innocent crew_members[], room rooms_list[], int *movements, int *gun, 
             }
             printf("\n Type 101 to cancel\n");
             printf("===================================================================================\n");
-            if (iterations == 0)
-            {
-                printf("There are no people here, unable to kill\n");
-                break;
-            }
+
             while (victim < 0 || victim > rooms_list[current_room].people_in_it)
             {
                 victim = prompt_int("/kill/> ");
@@ -368,12 +376,13 @@ void kill(innocent crew_members[], room rooms_list[], int *movements, int *gun, 
             }
         }
     }
-    printf("===================================================================================\n");
+
     if (player_is_in_room == 0)
     {
-        printf("You are not in a Room\n");
+        printf("You are not in a Room. Type \"move\" and find someone if you want to kill him.\n");
     }
-}
+    printf("===================================================================================\n");
+}   
 
 void clear(void)
 {
@@ -464,6 +473,7 @@ void discovered(innocent crew_members[], room rooms_list[], int room_num, int *c
         choose_to_kill = prompt_int(" /discovered/kill/> ");
     }
     
+    printf("===================================================================================\n");
     printf("Choose your weapon: \n\n");
     printf(" 1- Gun (%i Bullets left)\n 2- Knife\n\n", *ammo);
     printf("===================================================================================\n");

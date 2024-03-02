@@ -10,7 +10,7 @@
 #define NAMES 71
 #define DAYS_TO_WORK 7
 #define MAX_BULLETS 2
-#define MOVEMENTS_PER_ROUND 10
+#define MOVEMENTS_PER_ROUND 8
 
 // List to use
 char *facility_rooms[] = {"Computers Area", "Laboratory", "Storage Room", "Armory", "Offices", "Basement Access",
@@ -179,7 +179,7 @@ int main(void)
             all_death_ending();
         }
     
-        printf(" Day %i: %i Days Remaining || ", WorkDay + 1, DAYS_TO_WORK - WorkDay);
+        printf(" Day %i of %i || ", WorkDay + 1, DAYS_TO_WORK );
         // Print Remaining Objects to Steal
         printf("%i/%i Objects || ", loot, LOOT_TO_STEAL);
         printf("FACTION MEMBERS' STATUS -> Name - Mood");
@@ -206,7 +206,7 @@ int main(void)
         }
         // Ammunition Given
         int ammo = (rand() % MAX_BULLETS) + 1;
-        printf("- You have recieved a Knife and a Gun with %i shots", ammo);
+        printf("- You have received a knife and a gun with %i shots", ammo);
         printf("\n===================================================================================\n");
         number_pressed("> Type 1 to Continue: ", 1);
         // ending = true;
@@ -259,9 +259,9 @@ int main(void)
 
         // Command Line Message
         printf("===================================================================================\n");
-        printf(" __Welcome to the Command Line Movement Report System (CLMRS)__\n\n In MendedSun we appreciate data" 
-        " collection. You'll report every movement you make\n through the day. Use written commands"
-        " to tell us every action you do\n Thank you for letting us use you.");
+        printf(" Welcome to the Command Line Movement Report System (CLMRS)\n\n In MendedSun we appreciate data" 
+        " collection. You'll report every movement you make\n through the day. Use the commands"
+        " to tell us every action you do. Thank you for\n letting us employ you.");
         printf("\n\n YOU HAVE %i MOVEMENTS LEFT", movements);
         printf("\n===================================================================================\n");
         printf("> Type \"help\" to see the commands\n");
@@ -422,7 +422,12 @@ void increse_paranoia_if_kill(innocent crew_members[])
     {
         if (crew_members[i].alive)
         {
-            crew_members[i].mood = crew_members[i].mood - ((rand() % 20) + 15) * death_members;
+            crew_members[i].mood = crew_members[i].mood - ((rand() % 10) + 5) * death_members;
+            
+            if (crew_members[i].mood < 0)
+            {
+                crew_members[i].mood = 0;
+            } 
         }
     }
 }
