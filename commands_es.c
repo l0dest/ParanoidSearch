@@ -9,12 +9,12 @@ void help(void)
     printf("===================================================================================\n");
     printf(" Enterprise Macro Systems - CLMRS version 6.7 - [MendedSun]\n\n");
     printf(" help : muestra esta lista.\n\n");
-    printf(" move : permite moverte a otras habitaciones, selecciona el número de la elegida\n"
+    printf(" move : permite moverte a otras habitaciones, selecciona el numero de la elegida\n"
     " (cuesta 1 movimiento).\n\n");
-    printf(" roominfo : muetra el número de personas, objetos y chances de se atrapado si\n robas en la habitación actual.\n\n");
-    printf(" steal : una vez en una habitación, si hay objetos, robas uno de ellos.\n (cuesta 1 movimiento"
-    " y puedes ser atrapado por colegas según su estado de ánimo).\n\n");
-    printf(" kill : selecciona para matar a un colega, usar la pistola da un 100%% de chances de\n éxito, "
+    printf(" roominfo : muetra el numero de personas, objetos y chances de se atrapado si\n robas en la habitacion actual.\n\n");
+    printf(" steal : una vez en una habitacion, si hay objetos, robas uno de ellos.\n (cuesta 1 movimiento"
+    " y puedes ser atrapado por colegas segun su estado de ánimo).\n\n");
+    printf(" kill : selecciona para matar a un colega, usar la pistola da un 100%% de chances de\n exito, "
     "usar el cuchillo da un 20%% de chances de éxito. Si alguien te ve, eres\n descubierto y debes eliminarlos.\n\n");
     printf(" people : muesta el estado de tus colegas.\n\n rooms : muestra las habitaciones de la casa.\n\n");
     printf(" clear : limpia la consola de comandos.\n");
@@ -25,7 +25,7 @@ void help(void)
 void move(int *floor, int *movements, innocent crew_members[], room rooms_list[])
 {
     printf("===================================================================================\n");
-    printf(" Escribe el número de la habitación a la que quieras ir: \n\n");
+    printf(" Escribe el numero de la habitación a la que quieras ir: \n\n");
     int location = 100; //default
     switch (*floor)
     {
@@ -50,7 +50,7 @@ void move(int *floor, int *movements, innocent crew_members[], room rooms_list[]
                 for (int i = 0; i < ROOMS_NUM; i++) rooms_list[i].player_in = 0;
                 *floor = 1;
                 *movements = *movements - 1;
-                printf("Ahora estás en el 2do piso | %i Movemimientos Restantes\n", *movements);
+                printf("Ahora estas en el 2do piso | %i Movimimientos Restantes\n", *movements);
                 break;
             }
 
@@ -60,7 +60,7 @@ void move(int *floor, int *movements, innocent crew_members[], room rooms_list[]
             // Reset Player Room Position
             for (int i = 0; i < ROOMS_NUM; i++) rooms_list[i].player_in = 0;
             rooms_list[location - 1].player_in = true; // Set position tu current room
-            printf("Ahora estás en %s | %i Movimientos Restantes\n", rooms_list[location - 1].name, *movements);
+            printf("Ahora estas en %s | %i Movimientos Restantes\n", rooms_list[location - 1].name, *movements);
             break;
 
         case 1:
@@ -84,7 +84,7 @@ void move(int *floor, int *movements, innocent crew_members[], room rooms_list[]
                 for (int i = 0; i < ROOMS_NUM; i++) rooms_list[i].player_in = 0;
                 *floor = 0;
                 *movements = *movements - 1;
-                printf("Ahora estás en el 1er piso | %i Movimientos Restantes\n", *movements);
+                printf("Ahora estas en el 1er piso | %i Movimientos Restantes\n", *movements);
                 break;
             }
 
@@ -92,7 +92,7 @@ void move(int *floor, int *movements, innocent crew_members[], room rooms_list[]
             // Reset Player Room Position
             for (int i = 0; i < ROOMS_NUM; i++) rooms_list[i].player_in = 0;
             rooms_list[location - 1].player_in = true; // Set position to current room
-            printf("Ahora estás en %s | %i Movimientos Restantes\n", rooms_list[location - 1].name, *movements);   
+            printf("Ahora estas en %s | %i Movimientos Restantes\n", rooms_list[location - 1].name, *movements);   
 
             break;
     }
@@ -142,7 +142,7 @@ void roominfo(innocent crew_members[], room rooms_list[])
             return;
         }
     }
-    printf("No estás en una habitación. Escribe \"move\" y ve a una para consultar su información.\n");
+    printf("No estás en una habitacion. Escribe \"move\" y ve a una para consultar su informacion.\n");
 }
 
 // Steal Mechanic and its Consequences
@@ -196,7 +196,7 @@ void steal(int *loot, int *movements, innocent crew_members[], room rooms_list[]
             // If there are no objects there
             else
             {
-                printf("No hay objetos para robar aquí.\n");
+                printf("No hay objetos para robar aqui.\n");
                 printf("===================================================================================\n");
             }
         }
@@ -204,7 +204,7 @@ void steal(int *loot, int *movements, innocent crew_members[], room rooms_list[]
     // If PLayer is not in a Room
     if (player_is_in_room == 0)
     {
-        printf("No estás en una habitación, escribe \"move\", selecciona una y escribe\n\"roominfo\" para ver sus items.\n");
+        printf("No estás en una habitacion, escribe \"move\", selecciona una y escribe\n\"roominfo\" para ver sus items.\n");
         printf("===================================================================================\n");
     }
 }
@@ -235,11 +235,11 @@ void kill(innocent crew_members[], room rooms_list[], int *movements, int *gun, 
             player_is_in_room = 1;
             if (rooms_list[current_room].people_in_it == 0)
             {
-                printf("No hay nadie a quien matar aquí\n");
+                printf("No hay nadie a quien matar aqui\n");
                 break;
             }
             printf("===================================================================================\n");
-            printf(" Selecciona el número correspondiente al miembro:\n\n");
+            printf(" Selecciona el numero correspondiente al miembro:\n\n");
             for (int i = 0; i < CREW_MEMBERS; i++)
             {
                 if (crew_members[i].room == current_room && crew_members[i].alive == true)
@@ -264,7 +264,7 @@ void kill(innocent crew_members[], room rooms_list[], int *movements, int *gun, 
             if (victim == 101) break;
             
             printf("===================================================================================\n");
-            printf(" Elije el número del arma que quieras usar:\n\n");
+            printf(" Elije el numero del arma que quieras usar:\n\n");
             printf(" 1- Pistola (%i Balas Restantes)\n 2- Cuchillo\n\n", *gun);
             printf(" Escribe 101 para cancelar\n");
             printf("===================================================================================\n");
@@ -281,7 +281,7 @@ void kill(innocent crew_members[], room rooms_list[], int *movements, int *gun, 
                 case 1:
                     if (*gun <= 0)
                     {
-                        printf(" ¡FALLASTE! No tienes balas.\n");
+                        printf(" FALLASTE! No tienes balas.\n");
                         printf("===================================================================================\n");
                         return;
                     }
@@ -294,8 +294,8 @@ void kill(innocent crew_members[], room rooms_list[], int *movements, int *gun, 
                             {
                                 // Kill Confirmation
                                 printf("===================================================================================\n");
-                                printf(" > Escribe el número - Matar a [%s]?\n\n", crew_members[i].name);
-                                printf(" 1- Sí\n 2- No\n\n");
+                                printf(" > Escribe el numero - Matar a [%s]?\n\n", crew_members[i].name);
+                                printf(" 1- Si\n 2- No\n\n");
                                 printf("===================================================================================\n");
                                 
                                 while (proceed < 1 || proceed > 2)
@@ -311,7 +311,7 @@ void kill(innocent crew_members[], room rooms_list[], int *movements, int *gun, 
 
                                 if(*gun == 0)
                                 {
-                                    printf(" >> Munición Agotada <<\n"); // Referencias ;)
+                                    printf(" >> Municion Agotada <<\n"); // Referencias ;)
                                 }
                                 else{
                                     printf(" >> [%i] Balas Restantes <<\n", *gun);
@@ -342,7 +342,7 @@ void kill(innocent crew_members[], room rooms_list[], int *movements, int *gun, 
                                 printf("===================================================================================\n");
                                 printf(" > Escribe el número - Matar a [%s]?\n\n", crew_members[i].name);
                                 printf(" > Nota: Usar el cuchillo como arma ofensiva primaria es altamente arriesgado.\n\n");
-                                printf(" 1- Sí\n 2- No\n\n");
+                                printf(" 1- Si\n 2- No\n\n");
                                 printf("===================================================================================\n");
                                 
                                 while (proceed < 1 || proceed > 2)
@@ -434,16 +434,16 @@ void discovered(innocent crew_members[], room rooms_list[], int room_num, int *c
             printf("TE TENGO! Maldita serpiente.\n");
             break;
         case 2:
-            printf("QUIETO AHÍ!\n");
+            printf("QUIETO AHI!\n");
             break;
         case 3:
             printf("Rata sucia. QUIETO!!\n");
             break;
         case 4:
-            printf("Te enviaré al infierno. Réptil!\n");
+            printf("Te enviare al infierno. Reptil!\n");
             break;
         case 5:
-            printf("VEN AQUÍ, COBARDE!!\n");
+            printf("VEN AQUI, COBARDE!!\n");
             break;
     }
     printf("===================================================================================\n");
@@ -477,7 +477,7 @@ void discovered(innocent crew_members[], room rooms_list[], int room_num, int *c
         weapon_choosen = prompt_int(" /discovered/kill/weapon/> ");
         if (weapon_choosen == 1 && *ammo == 0)
         {
-            printf(" ¡FALLASTE! No tienes balas.\n");
+            printf(" FALLASTE! No tienes balas.\n");
             printf("===================================================================================\n");
             
         }
@@ -502,7 +502,7 @@ void discovered(innocent crew_members[], room rooms_list[], int room_num, int *c
 
                     if(*ammo == 0)
                     {
-                        printf(" >> Munición Agotada <<\n"); // Referencias ;)
+                        printf(" >> Municion Agotada <<\n"); // Referencias ;)
                     }
                     else{
                         printf(" >> [%i] Balas Restantes <<\n", *ammo);
@@ -558,7 +558,7 @@ void discovered(innocent crew_members[], room rooms_list[], int room_num, int *c
 void discovered_fail(void)
 {
     printf("===================================================================================\n");
-    printf(" FALLASTE\n\n Fuiste descubierto, ahora serás ejecutado.\n\n EL FIN.\n");
+    printf(" FALLASTE\n\n Fuiste descubierto, ahora seras ejecutado.\n\n EL FIN.\n");
     printf("===================================================================================\n");
     number_pressed("> Escribe 1 para salir: ", 1);
     exit(0);
@@ -568,10 +568,10 @@ void bad_quota_ending(void)
     system("clear");
     printf("===================================================================================\n");
     printf("\t\t\t\tMENSAJE RECIBIDO\n\n");
-    printf(" La fecha límite ha legado, no pudiste colectar la cantidad suficiente de\n infomación y objetos."
+    printf(" La fecha limite ha legado, no pudiste colectar la cantidad suficiente de\n infomacion y objetos."
     " La inteligencia de nuestro enemigo es una fuerza a ser\n reconocida. Muy posiblemente consiguieron algo de nosotros.\n\n"
-    " Esta guerra tomo un giro inesperado en nuestra contra, no vemos un futuro exitoso\n ni para nosotros. Ni para tí.\n\n\n");
-    printf(" -Conexión Terminada.\n");
+    " Esta guerra tomo un giro inesperado en nuestra contra, no vemos un futuro exitoso\n ni para nosotros. Ni para ti.\n\n\n");
+    printf(" -Conexion Terminada.\n");
     printf("===================================================================================\n");
     number_pressed("> Escribe 1 para salir: ", 1);
     exit(0);
@@ -583,14 +583,14 @@ void good_quota_ending(void)
     printf("===================================================================================\n");
     printf("\t\t\t\tMENSAJE RECIBIDO\n\n");
     printf(" Agente, exitosamente ha conseguido todos los objetos necesarios.\n Gracias a sus servicios finalmente podemos"
-    " marcar un punto de cierre a esta\n guerra sin sentido. La paz florecerá en todos lados gracias a usted.\n" 
+    " marcar un punto de cierre a esta\n guerra sin sentido. La paz florecera en todos lados gracias a usted.\n" 
     " Estaremos en contacto.\n\n");
     printf("-Conexión Terminada.\n");
     printf("===================================================================================\n");
     number_pressed("> Escribe 1 para Celebrar: ", 1);
 
     printf("===================================================================================\n");
-    printf(" * Te sientas, miras al horizonte y tomás un poco de café *\n\n");
+    printf(" * Te sientas, miras al horizonte y tomas un poco de cafe *\n\n");
     printf(" Gracias por Jugar ;)\n");
     printf("\t\t-Lodest\n");
     printf("===================================================================================\n");
@@ -604,8 +604,9 @@ void all_death_ending(void)
     system("clear");
     printf("===================================================================================\n");
     printf("\t\t\t\tMENSAJE RECIBIDO\n\n");
-    printf(" Has eliminado a todos los miembros sin recolectar todos los objetos.\n Si hubiesemos necesitado un asesino," "hubiesemos contratado uno.\n Después de no\n recibir respuesta, agentes de BrokenMoon se dirigen a tu locación ahora mismo.\n" " Es imposible escapar vivo de allí.\n\n"
-    "-Conexión Terminada\n");
+    printf(" Has eliminado a todos los miembros sin recolectar todos los objetos.\n Si hubiesemos necesitado un asesino,"
+    "hubiesemos contratado uno.\n Despues de no\n recibir respuesta, agentes de BrokenMoon se dirigen a tu locacion ahora mismo\n" " Es imposible escapar vivo de alli.\n\n"
+    "-Conexion Terminada\n");
     printf("===================================================================================\n");
     number_pressed("> Escribe 1 para salir ", 1);
     exit(0);

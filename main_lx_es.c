@@ -13,8 +13,8 @@
 #define MOVEMENTS_PER_ROUND 10
 
 // List to use
-char *facility_rooms[] = {"Area de Computadoras", "Laboratorio", "Depósito", "Armeria", "Ofinas", "Acceso al Sótano",
-                            "Acceso al Ático", "Habitaciones", "Baños", "Bar", "Cocina", "Biblioteca"};
+char *facility_rooms[] = {"Area de Computadoras", "Laboratorio", "Deposito", "Armeria", "Ofinas", "Acceso al Sotano",
+                            "Acceso al Atico", "Habitaciones", "Lavabo", "Bar", "Cocina", "Biblioteca"};
 
 
 char* commands[] = {"help", "move", "steal", "kill", "clear", "people", "rooms", "roominfo"};
@@ -53,16 +53,16 @@ int main(void)
     printf("\n===================================================================================\n");
     printf("\t\t\t\tMENSAJE RECIBIDO\n");
     printf("\n Bienvenido otra y posiblemente ultima vez a MendedSun\n Estamos en el clímax de la guerra con"
-    " nuestra facción enemiga BrokenMoon\n Es vital para nosotros que te infiltres en una de sus bases y "
-    "ROBES\n tanta información y objetos valiosos como puedas.\n\n");
-    printf(" Ten cuidado alguno de tus \"colegas\" podria estar alerta de tí.\n");
+    " nuestra faccion enemiga BrokenMoon\n Es vital para nosotros que te infiltres en una de sus bases y "
+    "ROBES\n tanta informacion y objetos valiosos como puedas.\n\n");
+    printf(" Ten cuidado alguno de tus \"colegas\" podria estar alerta de ti.\n");
     printf("\n===================================================================================\n");
     
     number_pressed("> Escribe 1 para continuar: ", 1);
 
     printf("===================================================================================\n");
-    printf("\n Estaras en sus instalaciones una semana\n Al principio de cada día sere capaz de enviarte un" 
-    " reporte con\n informació valiosa acerca de tus compañeros. Piensa dos veces tus acciones\n Porque son limitadas."
+    printf("\n Estaras en sus instalaciones una semana\n Al principio de cada dia sere capaz de enviarte un" 
+    " reporte con\n informacion valiosa acerca de tus compañeros. Piensa dos veces tus acciones\n Porque son limitadas."
     " Buena suerte y trata de no ser descubierto.\n\n -1NF=)>=|)\n");
     printf("\n===================================================================================\n");
 
@@ -123,9 +123,9 @@ int main(void)
 
     // Print House's Blueprints
     printf("\n===================================================================================\n");
-    printf(" Esta instalación tiene 2 pisos. Cada uno tiene 6 habitaciones en él. Todos los miembros\n "
-    "se encuentran tras cada día en Main Room," 
-    " alocada en el primer piso. (Los objetos\n no aparecen allí). Puedes consultar esta información luego.\n\n");
+    printf(" Esta instalacion tiene 2 pisos. Cada uno tiene 6 habitaciones en el. Todos los miembros\n "
+    "se encuentran tras cada dia en la habitación principal," 
+    " alocada en el primer piso. (Los objetos\n no aparecen alli). Puedes consultar esta informacion luego.\n\n");
 
     rooms(rooms_list); // Print The Facility Rooms and their Floors
 
@@ -179,10 +179,10 @@ int main(void)
             all_death_ending();
         }
     
-        printf(" Día %i de %i || ", WorkDay + 1, DAYS_TO_WORK);
+        printf(" Dia %i de %i || ", WorkDay + 1, DAYS_TO_WORK);
         // Print Remaining Objects to Steal
         printf("%i/%i Objetos|| ", loot, LOOT_TO_STEAL);
-        printf("Estado de los Miembros -> Nombre - Ánimo");
+        printf("Estado de los Miembros -> Nombre - Animo");
         printf("\n===================================================================================\n");
 
         // Print Crew Members and their Status
@@ -200,7 +200,7 @@ int main(void)
         {
             if (crew_members[i].alive == false)
             {
-                printf("\n- Todos están un poco más nerviosos\n\n");
+                printf("\n- Todos estan un poco más nerviosos\n\n");
                 break;
             }
         }
@@ -260,7 +260,7 @@ int main(void)
         // Command Line Message
         printf("===================================================================================\n");
         printf(" _Bienvenido al Sistema de Reporte de Movimientos de la Linea de Comandos (CLMRS)_\n\n" 
-        " En MendedSun apreciamos la recolección de datos. Reportaras cada movimiento que\n hagas en el día." 
+        " En MendedSun apreciamos la recoleccion de datos. Reportaras cada movimiento que\n hagas en el dia." 
         " Usa los comandos proporcionados para informarnos todo.\n Gracias por dejarnos emplearte.");
         printf("\n\n TIENES %i MOVIMIENTOS", movements);
         printf("\n===================================================================================\n");
@@ -348,7 +348,7 @@ int main(void)
 
         int death_members = 0;
         printf("===================================================================================\n");
-        printf(" La jornada terminó:\n\n");
+        printf(" La jornada termino:\n\n");
         printf("- %i/%i Objetos\n", loot, LOOT_TO_STEAL);
         for (int i = 0; i < CREW_MEMBERS; i++)
         {
@@ -359,7 +359,7 @@ int main(void)
         }
         printf("- %i Personas murieron hasta el momento\n\n", death_members);
         printf("===================================================================================\n");
-        number_pressed("> Escribe 1 para empezar el siguiente día: ", 1);
+        number_pressed("> Escribe 1 para empezar el siguiente dia: ", 1);
     }
     // Close the Names file
     fclose(mercstats);
