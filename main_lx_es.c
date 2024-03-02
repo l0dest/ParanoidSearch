@@ -10,7 +10,7 @@
 #define NAMES 71
 #define DAYS_TO_WORK 7
 #define MAX_BULLETS 2
-#define MOVEMENTS_PER_ROUND 10
+#define MOVEMENTS_PER_ROUND 8
 
 // List to use
 char *facility_rooms[] = {"Area de Computadoras", "Laboratorio", "Deposito", "Armeria", "Ofinas", "Acceso al Sotano",
@@ -52,7 +52,7 @@ int main(void)
 
     printf("\n===================================================================================\n");
     printf("\t\t\t\tMENSAJE RECIBIDO\n");
-    printf("\n Bienvenido otra y posiblemente ultima vez a MendedSun\n Estamos en el clímax de la guerra con"
+    printf("\n Bienvenido otra y posiblemente ultima vez a MendedSun\n Estamos en el climax de la guerra con"
     " nuestra faccion enemiga BrokenMoon\n Es vital para nosotros que te infiltres en una de sus bases y "
     "ROBES\n tanta informacion y objetos valiosos como puedas.\n\n");
     printf(" Ten cuidado alguno de tus \"colegas\" podria estar alerta de ti.\n");
@@ -206,7 +206,7 @@ int main(void)
         }
         // Ammunition Given
         int ammo = (rand() % MAX_BULLETS) + 1;
-        printf("- Recibiste un cuchillo y un arma con %i disparos", ammo);
+        printf("- Recibiste un cuchillo y una pistola con %i disparos", ammo);
         printf("\n===================================================================================\n");
         number_pressed("> Escribe 1 para Continuar: ", 1);
         // ending = true;
@@ -259,7 +259,7 @@ int main(void)
 
         // Command Line Message
         printf("===================================================================================\n");
-        printf(" _Bienvenido al Sistema de Reporte de Movimientos de la Linea de Comandos (CLMRS)_\n\n" 
+        printf(" Bienvenido al Sistema de Reporte de Movimientos de la Linea de Comandos (CLMRS)\n\n" 
         " En MendedSun apreciamos la recoleccion de datos. Reportaras cada movimiento que\n hagas en el dia." 
         " Usa los comandos proporcionados para informarnos todo.\n Gracias por dejarnos emplearte.");
         printf("\n\n TIENES %i MOVIMIENTOS", movements);
@@ -422,7 +422,11 @@ void increse_paranoia_if_kill(innocent crew_members[])
     {
         if (crew_members[i].alive)
         {
-            crew_members[i].mood = crew_members[i].mood - ((rand() % 20) + 15) * death_members;
+            crew_members[i].mood = crew_members[i].mood - ((rand() % 10) + 5) * death_members;
+            if (crew_members[i].mood < 0)
+            {
+                crew_members[i].mood = 0;
+            } 
         }
     }
 }

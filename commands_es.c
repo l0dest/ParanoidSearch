@@ -130,6 +130,7 @@ void roominfo(innocent crew_members[], room rooms_list[])
                 }
             }
             mood_average = mood_average / rooms_list[i].people_in_it;
+            if (mood_average < 1) mood_average = 1;
             // numPeople * 5 / average_mood * 100
             chance_to_fail = (((rooms_list[i].people_in_it) * 5) / (mood_average)) * 100;
             if (chance_to_fail < 0) chance_to_fail = 0;
@@ -168,6 +169,7 @@ void steal(int *loot, int *movements, innocent crew_members[], room rooms_list[]
                     }
                 }
                 mood_average = mood_average / rooms_list[i].people_in_it;
+                if (mood_average < 1) mood_average = 1;
                 // numPeople * 5 / average_mood * 100
                 chance_to_fail = (((rooms_list[i].people_in_it) * 5) / (mood_average)) * 100;
                 random_num = (rand() % 100) + 1;
@@ -219,6 +221,10 @@ void mood_steal(int iterations_to_room, innocent crew_members[], room rooms_list
         {
             decrease_rate = (rand() % 15) + 1;
             crew_members[i].mood = crew_members[i].mood - decrease_rate; 
+            if (crew_members[i].mood < 0)
+            {
+                crew_members[i].mood = 0;
+            } 
         }
     }
 }
@@ -374,7 +380,7 @@ void kill(innocent crew_members[], room rooms_list[], int *movements, int *gun, 
     }
     if (player_is_in_room == 0)
     {
-        printf("No estás en una habitación\n");
+        printf("No estás en una habitación. Escribe \"move\" y busca a alguien si quieres eliminarlo\n");
     }
     printf("===================================================================================\n");
 }
