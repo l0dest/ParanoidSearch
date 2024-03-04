@@ -14,4 +14,5 @@ Your mission is to steal 30 objects from the base, you have a deadline of 7 days
 
 ***Each day you are granted with 8 moves, spending all of them means the end of a day***.
 
-You can move do things interacting with a command_line-like system made in the game 
+You can move do things interacting with a command_line-like system made in the game:
+![Tux, the Linux mascot](https://github.com/l0dest/ParanoidSearch/blob/[branch]/image.jpg?raw=true)
