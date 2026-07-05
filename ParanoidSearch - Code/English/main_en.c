@@ -7,7 +7,7 @@
 #include <time.h>
 #include "commands.h"
 
-#define NAMES 71
+#define NAMES 100
 #define MAX_BULLETS 2
 #define MOVEMENTS_PER_ROUND 8
 
