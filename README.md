@@ -35,8 +35,8 @@ The mood of you colleagues affects if they discover you when you steal in front 
 - Another collegue don't come to work (You killed one of them).
 
 ## Technical Things
-The program is written in the C programming lenguage. Has two files with code one ("main_lx.c") for the game itself and the other ("commands.c") for the different functions, it also contains a header file ("commands.h") with the definitions of the functions, libraries, structs, etc.
-A csv file is within the files and it contains the possibly names of the people, **you should execute the program in the same folder as this csv file or it won't work, because its necessary to display the different names.**
+The program is written in the C programming lenguage. Has two files with code one ("main_es.c" OR "main_en.c (depending on what language you play)) for the game itself and the other ("commands.c") for the different functions, it also contains a header file ("commands.h") with the definitions of the functions, libraries, structs, etc.
+A csv file is within the files and it contains the possibly names of the people (some are generic names, some of them names of my beloved ones) **you should execute the program in the same folder as this csv file or it won't work, because its necessary to display the different names.**
 
 ## Feedback
 If you want to submit any kind of feedback I would be very pleased to read it.
