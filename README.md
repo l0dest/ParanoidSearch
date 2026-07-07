@@ -5,7 +5,7 @@
 All input an output information are given in the command line and you'll use certains commands to interact with you environment.
 
 ## Downloading and Executing
-In the folder downloads you'll find folders for **Windows** and **Linux**, inside of them are two zip files, one for the **ENGLISH** version of the game and other for the **SPANISH**. Unzipping them gives you the codes, a makefile, a csv file used for the different names and a executable file.
+In **Releases** you'll find zip files with executables inside both for **Windows** and **Linux**, you may choose the language of your preference **ENGLISH** or **SPANISH**. If you want to compile the code yourself in the *"Paranoid Search - Code"* folder you'll find the files neccesary (main_es.c/main_en.c, commands.c, commands.h, mercenaries.csv) for creating the executable yourself with the compiler!
 
 Once you are in the desired folder you can either run the executable or get access to the code if you want to compile it yourself. The code is free to see and download for everyone who want it. This game is mainly a test for me.
 
@@ -36,7 +36,7 @@ The mood of you colleagues affects if they discover you when you steal in front 
 
 ## Technical Things
 The program is written in the C programming lenguage. Has two files with code one ("main_lx.c") for the game itself and the other ("commands.c") for the different functions, it also contains a header file ("commands.h") with the definitions of the functions, libraries, structs, etc.
-A csv file is within the files and it contains the possibly names of the people, you should execute the program in the same folder as this csv file or it won't work, because its necessary to it.
+A csv file is within the files and it contains the possibly names of the people, **you should execute the program in the same folder as this csv file or it won't work, because its necessary to display the different names.**
 
 ## Feedback
 If you want to submit any kind of feedback I would be very pleased to read it.
